@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird Clone</title>
+    <style>
+        body {
+            text-align: center;
+        }
+        canvas {
+            background-color: skyblue;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="400" height="500"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        
+        let backgroundImg = new Image();
+        backgroundImg.src = "sky.jpg";
+
+        let birdImg = new Image();
+        birdImg.src = "bird.webp";
+        
+        let pipeTopImg = new Image();
+        pipeTopImg.src = "pipe2.png";
+        
+        let pipeBottomImg = new Image();
+        pipeBottomImg.src = "pipe1.png";
+        
+        let bird = { x: 50, y: 150, width: 34, height: 24, gravity: 0.1, lift: -4, velocity: 0 };
+        let pipes = [];
+        let frame = 0;
+        let gameOver = false;
+        
+        const gameOverMessages = [
+            "Game Over! Press OK to restart. MALUYA KAPA!",
+            "Oops! You need more practice! Try again! KY MAHINA KANG NILALANG!",
+            "Better luck next time! Press OK to restart. SOWS! PAG ROBLOX NALA!",
+            "Keep going! You can do better! Try again. PWEE BAWAL IT MAHINA DIDI!",
+            "Flappy Bird down! Time to retry! RETRY MO THIS!"
+            "NGALAS!"
+            "ARINGET!"  
+        ];
+
+        function drawBackground() {
+            ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
+        }
+
+        function drawBird() {
+            ctx.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+        }
+
+        function updateBird() {
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+            if (bird.y + bird.height > canvas.height || bird.y < 0) {
+                resetGame();
+            }
+        }
+
+        function drawPipes() {
+            pipes.forEach(pipe => {
+                ctx.drawImage(pipeTopImg, pipe.x, 0, pipe.width, pipe.top);
+                ctx.drawImage(pipeBottomImg, pipe.x, pipe.bottom, pipe.width, canvas.height - pipe.bottom);
+            });
+        }
+
+        function updatePipes() {
+            if (frame % 90 === 0) {
+                let pipeHeight = Math.random() * (canvas.height / 2);
+                pipes.push({ x: canvas.width, top: pipeHeight, bottom: pipeHeight + 100, width: 50 });
+            }
+            pipes.forEach(pipe => {
+                pipe.x -= 2;
+                if (bird.x < pipe.x + pipe.width && bird.x + bird.width > pipe.x && (bird.y < pipe.top || bird.y + bird.height > pipe.bottom)) {
+                    resetGame();
+                }
+            });
+        }
+
+        function resetGame() {
+            bird.y = 150;
+            bird.velocity = 0;
+            pipes = [];
+            frame = 0;
+            gameOver = true;
+            let randomMessage = gameOverMessages[Math.floor(Math.random() * gameOverMessages.length)];
+            alert(randomMessage);
+            gameOver = false;
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBackground();
+            drawBird();
+            drawPipes();
+            if (!gameOver) {
+                updateBird();
+                updatePipes();
+                frame++;
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener("keydown", function() {
+            bird.velocity = bird.lift;
+        });
+
+        gameLoop();
+    </script>
+</body>
+</html>
